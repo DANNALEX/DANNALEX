@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>hidden-scan — raport metadate și conținut ascuns</title>
+<style>
+  body { font: 15px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; margin: 2rem auto; max-width: 68rem;
+         color: #16201f; background: #f6f8f8; padding: 0 1rem; }
+  h1 { font-size: 1.5rem; margin-bottom: 0.4rem; }
+  .summary-bar { background: #fff; border: 1px solid #cdd6d6; border-radius: 6px; padding: .8rem 1rem;
+                 margin-bottom: 1.2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 14px; }
+  .file { border: 1px solid #cdd6d6; border-radius: 6px; margin: 1.2rem 0;
+          background: #fff; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+  .hd { padding: .8rem 1rem; border-bottom: 1px solid #e2e8e8;
+        display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .hash { font: 12px ui-monospace, Consolas, monospace; color: #6b7a79; word-break: break-all; }
+  .risk { font-weight: 700; padding: .2rem .7rem; border-radius: 4px; font-size: 13px; }
+  .HIGH { background: #f7dfd9; color: #97301c; }
+  .MEDIUM { background: #f6e9cc; color: #8f6203; }
+  .LOW { background: #d8ebe7; color: #0b5e54; }
+  .clean-box { background: #eaf6f0; border-bottom: 1px solid #cce8da; padding: .7rem 1rem;
+               color: #0e5a3a; font-size: 13.5px; }
+  .clean-err { background: #fdf0ed; border-bottom: 1px solid #f3cfc6; padding: .7rem 1rem;
+               color: #97301c; font-size: 13.5px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: .55rem 1rem; border-bottom: 1px solid #eef2f2;
+           vertical-align: top; font-size: 14px; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #6b7a79; }
+  .sev-high { color: #97301c; font-weight: 600; }
+  .sev-medium { color: #8f6203; font-weight: 600; }
+  .sev-low, .sev-info { color: #6b7a79; }
+  .prob::after { content: " (probabil)"; color: #9aa; font-size: 12px; font-weight: normal; }
+  code { background: #eef2f2; padding: .1em .35em; border-radius: 3px;
+         font: 12px ui-monospace, Consolas, monospace; word-break: break-all; }
+  .empty { padding: 1rem; color: #6b7a79; }
+</style>
+</head>
+<body>
+<h1>hidden-scan v3.0 — Raport Metadate și Conținut Ascuns</h1>
+<div class="summary-bar">
+  <div><strong>Fișiere analizate:</strong> {{ reports | length }}</div>
+  <div><strong>Cu risc HIGH:</strong> {{ reports | selectattr("risk", "equalto", "HIGH") | list | length }}</div>
+  <div><strong>Cu risc MEDIUM:</strong> {{ reports | selectattr("risk", "equalto", "MEDIUM") | list | length }}</div>
+  <div><strong>Curățate (LOW):</strong> {{ reports | selectattr("risk", "equalto", "LOW") | list | length }}</div>
+</div>
+{% for r in reports %}
+<div class="file">
+  <div class="hd">
+    <div>
+      <strong>{{ r.file }}</strong>
+      <div class="hash">SHA-256: {{ r.sha256 }}</div>
+      <div class="hash">{{ r.filetype }} · {{ r.size_bytes }} B · {{ r.analyzed_at }}</div>
+    </div>
+    <span class="risk {{ r.risk }}">{{ r.risk }}</span>
+  </div>
+  {% if r.clean_result %}
+    {% if r.clean_result.cleaned %}
+    <div class="clean-box">
+      <strong>METADATE ȘTERSE CU SUCCES</strong> → Salvat în: <code>{{ r.clean_result.output_file }}</code><br>
+      Elemente eliminate: {{ r.clean_result.removed_items | join(" · ") }}
+      (Constatări înainte: <strong>{{ r.clean_result.before_findings_count }}</strong> → după curățare: <strong>{{ r.clean_result.after_findings_count }}</strong>)
+    </div>
+    {% else %}
+    <div class="clean-err">
+      <strong>Eroare la curățare:</strong> {{ r.clean_result.errors | join("; ") }}
+    </div>
+    {% endif %}
+  {% endif %}
+  {% if r.findings %}
+  <table>
+    <thead><tr><th>Severitate</th><th>Categorie</th><th>Constatare</th><th>Evidență</th></tr></thead>
+    <tbody>
+    {% for f in r.findings %}
+      <tr>
+        <td class="sev-{{ f.severity }} {{ 'prob' if f.confidence == 'probable' }}">{{ f.severity }}</td>
+        <td>{{ f.category }}</td>
+        <td><strong>{{ f.title }}</strong><br>{{ f.detail }}</td>
+        <td><code>{{ f.evidence }}</code></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">Nicio constatare detectată. (Absența nu dovedește curățenia absolută — vezi limitele.)</div>
+  {% endif %}
+  {% if r.errors %}
+  <div class="empty">Erori scaner: {{ r.errors | join("; ") }}</div>
+  {% endif %}
+</div>
+{% endfor %}
+</body>
+</html>
