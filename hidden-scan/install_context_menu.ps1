@@ -70,7 +70,7 @@ Add-MenuEntry -BaseRegPath "HKCU:\Software\Classes\Directory\Background" `
               -Icon "shell32.dll,23" `
               -CommandStr $CmdScanBg
 
-# 4. Scurtătură în SendTo (vizibilă direct și pe Windows 11) + pe Desktop
+# 4. Scurtătură în SendTo (vizibilă direct și pe Windows 11)
 $WshShell = New-Object -ComObject WScript.Shell
 $SendToDir = [Environment]::GetFolderPath("SendTo")
 if ($SendToDir) {
@@ -81,14 +81,4 @@ if ($SendToDir) {
     $ShortcutSendTo.Save()
 }
 
-$DesktopDir = [Environment]::GetFolderPath("Desktop")
-if ($DesktopDir) {
-    $ShortcutDesktop = $WshShell.CreateShortcut((Join-Path $DesktopDir "Scanare & Ștergere Metadate.lnk"))
-    $ShortcutDesktop.TargetPath = "powershell.exe"
-    $ShortcutDesktop.Arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"& { `$env:PYTHONPATH='$AppRoot'; pythonw.exe -m hidden_scan.gui }`""
-    $ShortcutDesktop.WorkingDirectory = $AppRoot
-    $ShortcutDesktop.IconLocation = "shell32.dll,240"
-    $ShortcutDesktop.Save()
-}
-
-Write-Host "[OK] Meniul Clic-Dreapta și scurtătura Desktop au fost instalate cu succes!" -ForegroundColor Green
+Write-Host "[OK] Meniul Clic-Dreapta în Windows Explorer a fost instalat cu succes!" -ForegroundColor Green

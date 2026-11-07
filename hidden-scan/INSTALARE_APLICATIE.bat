@@ -24,7 +24,7 @@ python scripts\make_fixtures.py
 python -m pytest -v
 
 echo.
-echo [3/4] Inregistrare Meniu Clic-Dreapta (pe fisiere si directoare) si Scurtatura Desktop...
+echo [3/4] Inregistrare Meniu Clic-Dreapta (pe fisiere si directoare) in Windows Explorer...
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0install_context_menu.ps1"
 
 echo.

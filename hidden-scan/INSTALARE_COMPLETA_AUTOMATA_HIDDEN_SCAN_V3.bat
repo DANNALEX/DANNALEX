@@ -4,8 +4,8 @@ chcp 65001 >nul
 title Instalator Automat Complet - hidden-scan v3.0 (Scanare si Stergere Metadate)
 echo ============================================================================
 echo   INSTALATOR AUTOMAT COMPLET - hidden-scan v3.0
-echo   (Extrage toate fisierele, instaleaza bibliotecile, meniul Clic-Dreapta
-echo    pentru fisiere si directoare, scurtatura Desktop si ruleaza testele)
+echo   (1. Extrage fisierele  2. Instaleaza bibliotecile Python
+echo    3. Ruleaza cele 22 teste  4. Inregistreaza meniul Clic-Dreapta)
 echo ============================================================================
 echo.
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script = [System.IO.File]::ReadAllText('%~f0', [System.Text.Encoding]::UTF8); Invoke-Expression $script"
@@ -30,7 +30,7 @@ if (Test-Path $DropboxParent) {
     $TargetRoot = Join-Path (Get-Location).Path 'hidden-scan'
 }
 
-Write-Host "[1/5] Creare structura de directoare in: $TargetRoot" -ForegroundColor Cyan
+Write-Host "[1/4] Creare folder aplicatie si extragere fisiere in: $TargetRoot" -ForegroundColor Cyan
 New-Item -ItemType Directory -Force -Path $TargetRoot | Out-Null
 
 function Write-AppFile {
@@ -43,8 +43,6 @@ function Write-AppFile {
     $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($FullPath, $Content, $Utf8NoBom)
 }
-
-Write-Host '[2/5] Extragere fisiere sursa aplicatie (26 fisiere)...' -ForegroundColor Cyan
 
 # --- pyproject.toml ---
 Write-AppFile -RelPath 'pyproject.toml' -Content @'
@@ -422,7 +420,7 @@ Add-MenuEntry -BaseRegPath "HKCU:\Software\Classes\Directory\Background" `
               -Icon "shell32.dll,23" `
               -CommandStr $CmdScanBg
 
-# 4. Scurtătură în SendTo (vizibilă direct și pe Windows 11) + pe Desktop
+# 4. Scurtătură în SendTo (vizibilă direct și pe Windows 11)
 $WshShell = New-Object -ComObject WScript.Shell
 $SendToDir = [Environment]::GetFolderPath("SendTo")
 if ($SendToDir) {
@@ -433,17 +431,7 @@ if ($SendToDir) {
     $ShortcutSendTo.Save()
 }
 
-$DesktopDir = [Environment]::GetFolderPath("Desktop")
-if ($DesktopDir) {
-    $ShortcutDesktop = $WshShell.CreateShortcut((Join-Path $DesktopDir "Scanare & Ștergere Metadate.lnk"))
-    $ShortcutDesktop.TargetPath = "powershell.exe"
-    $ShortcutDesktop.Arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"& { `$env:PYTHONPATH='$AppRoot'; pythonw.exe -m hidden_scan.gui }`""
-    $ShortcutDesktop.WorkingDirectory = $AppRoot
-    $ShortcutDesktop.IconLocation = "shell32.dll,240"
-    $ShortcutDesktop.Save()
-}
-
-Write-Host "[OK] Meniul Clic-Dreapta și scurtătura Desktop au fost instalate cu succes!" -ForegroundColor Green
+Write-Host "[OK] Meniul Clic-Dreapta în Windows Explorer a fost instalat cu succes!" -ForegroundColor Green
 '@
 
 # --- uninstall_context_menu.ps1 ---
@@ -509,7 +497,7 @@ python scripts\make_fixtures.py
 python -m pytest -v
 
 echo.
-echo [3/4] Inregistrare Meniu Clic-Dreapta (pe fisiere si directoare) si Scurtatura Desktop...
+echo [3/4] Inregistrare Meniu Clic-Dreapta (pe fisiere si directoare) in Windows Explorer...
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0install_context_menu.ps1"
 
 echo.
@@ -2657,31 +2645,29 @@ def test_clean_text_no_findings():
     assert unicode_scan.scan_text("text complet curat, fara pasageri") == []
 '@
 
-Write-Host '[OK] Toate fisierele aplicatiei au fost scrise pe disc.' -ForegroundColor Green
+Write-Host '[OK] Pasul 1 finalizat: Toate cele 26 de fisiere ale aplicatiei au fost scrise pe disc.' -ForegroundColor Green
 
-Write-Host '[3/5] Instalare pachet Python si dependente (pikepdf, Pillow, pdfminer.six, customtkinter, pytest)...' -ForegroundColor Cyan
+Write-Host '[2/4] Instalare pachet Python si biblioteci (pikepdf, Pillow, pdfminer.six, customtkinter, pytest)...' -ForegroundColor Cyan
 Push-Location $TargetRoot
 try {
     python -m pip install --upgrade pip
     python -m pip install -e ".[dev]"
 
-    Write-Host '[4/5] Generare fisiere de test si verificare automata (pytest)...' -ForegroundColor Cyan
+    Write-Host '[3/4] Generare fisiere de test si rulare verificare automata (22 teste pytest)...' -ForegroundColor Cyan
     python scripts\make_fixtures.py
     python -m pytest -v
 
-    Write-Host '[5/5] Inregistrare Meniu Clic-Dreapta in Windows Explorer + Scurtatura Desktop...' -ForegroundColor Cyan
+    Write-Host '[4/4] Inregistrare Meniu Clic-Dreapta in Windows Explorer (pe fisiere si directoare)...' -ForegroundColor Cyan
     & (Join-Path $TargetRoot 'install_context_menu.ps1')
 
     Write-Host ''
     Write-Host '============================================================================' -ForegroundColor Green
-    Write-Host '  INSTALARE FINALIZATA CU SUCCES!' -ForegroundColor Green
+    Write-Host '  INSTALARE FINALIZATA CU SUCCES (PASII 1, 2, 3, 4)!' -ForegroundColor Green
     Write-Host "  Locatie aplicatie: $TargetRoot" -ForegroundColor Green
     Write-Host '  Acum poti da CLIC-DREAPTA pe orice fisier sau director in Explorer:' -ForegroundColor Green
-    Write-Host '    1. Sterge Metadate (Copie Curata) / (Toate fisierele din director)' -ForegroundColor Yellow
-    Write-Host '    2. Scaneaza Metadate si Date Ascunse' -ForegroundColor Yellow
+    Write-Host '    - Sterge Metadate (Copie Curata) / (Toate fisierele din director)' -ForegroundColor Yellow
+    Write-Host '    - Scaneaza Metadate si Date Ascunse' -ForegroundColor Yellow
     Write-Host '============================================================================' -ForegroundColor Green
-
-    Start-Process pythonw.exe -ArgumentList '-m', 'hidden_scan.gui' -WorkingDirectory $TargetRoot
 } finally {
     Pop-Location
 }
