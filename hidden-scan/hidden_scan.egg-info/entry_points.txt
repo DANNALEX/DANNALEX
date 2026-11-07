@@ -1,3 +1,0 @@
-[console_scripts]
-hidden-scan = hidden_scan.cli:main
-hidden-scan-gui = hidden_scan.gui:main
