@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comprimare PDF Lizibil — Dosare Evaluare și Selecție</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-badge">PDF</div>
+        <div>
+          <h1>Optimizator &amp; Compresor PDF</h1>
+          <p class="subtitle">Reducere maximă a dimensiunii cu păstrarea lizibilității (CV-uri, diplome, dosare de evaluare)</p>
+        </div>
+      </div>
+      <div class="privacy-pill">
+        <span class="dot"></span>
+        100% Local în Browser (Confidențial GDPR)
+      </div>
+    </header>
+
+    <main class="main-grid">
+      <section class="left-panel">
+        <div class="card">
+          <div class="target-file-banner">
+            <div class="banner-label">Fișier țintă pregătit pentru încărcare:</div>
+            <div class="banner-path" id="targetPathText">C:\Users\dumit\Dropbox\0000.EU\0000.Claude acces\00000.LUCRU\00000.Scoli pentru viitor\000.DOC. DE EVALUARE SI SELECTIE_DK\Crt1.1_CV+doc_Bradatan D.pdf</div>
+            <button type="button" class="btn-secondary btn-sm" id="copyPathBtn">Copiază calea pentru fereastra Open</button>
+          </div>
+
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Încarcă fișierul PDF">
+            <input type="file" id="fileInput" accept="application/pdf,.pdf" hidden />
+            <div class="dropzone-icon">
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <path d="M12 18v-6"></path>
+                <path d="m9 15 3-3 3 3"></path>
+              </svg>
+            </div>
+            <h2>Trageți fișierul PDF aici sau apăsați pentru selectare</h2>
+            <p>Selectați <strong>Crt1.1_CV+doc_Bradatan D.pdf</strong> (sau orice alt document PDF)</p>
+          </div>
+        </div>
+
+        <div class="card settings-card">
+          <div class="card-header-row">
+            <h3>Nivel de comprimare &amp; Lizibilitate</h3>
+            <span class="preset-hint">Se recalculează instant la schimbare</span>
+          </div>
+
+          <div class="presets-grid" id="presetsGrid">
+            <button type="button" class="preset-btn" data-dpi="96" data-quality="0.52">
+              <span class="preset-title">Maximă (Extremă)</span>
+              <span class="preset-desc">96 DPI · Calitate 52%</span>
+              <span class="preset-tag">Fișier minim, încă lizibil</span>
+            </button>
+            <button type="button" class="preset-btn active" data-dpi="130" data-quality="0.65">
+              <span class="preset-title">Optim Lizibil (Recomandat)</span>
+              <span class="preset-desc">130 DPI · Calitate 65%</span>
+              <span class="preset-tag">Echilibru ideal text + ștampile</span>
+            </button>
+            <button type="button" class="preset-btn" data-dpi="165" data-quality="0.76">
+              <span class="preset-title">Claritate Înaltă</span>
+              <span class="preset-desc">165 DPI · Calitate 76%</span>
+              <span class="preset-tag">Detalii fine păstrate</span>
+            </button>
+          </div>
+
+          <div class="sliders-container">
+            <div class="control-group">
+              <div class="control-label">
+                <label for="dpiInput">Rezoluție pagină (DPI)</label>
+                <span class="control-value" id="dpiValue">130 DPI</span>
+              </div>
+              <input type="range" id="dpiInput" min="72" max="220" step="2" value="130" />
+              <div class="range-marks">
+                <span>72 DPI (Mic)</span>
+                <span>130 DPI (Optim)</span>
+                <span>220 DPI (Clar)</span>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <label for="qualityInput">Calitate compresie JPEG</label>
+                <span class="control-value" id="qualityValue">65%</span>
+              </div>
+              <input type="range" id="qualityInput" min="30" max="92" step="1" value="65" />
+              <div class="range-marks">
+                <span>30% (Compresie agresivă)</span>
+                <span>65% (Echilibrat)</span>
+                <span>92% (Fără artefacte)</span>
+              </div>
+            </div>
+
+            <div class="options-row">
+              <label class="checkbox-label">
+                <input type="checkbox" id="contrastBoostInput" checked />
+                <span>Îmbunătățire claritate text scanat (Contrast inteligent pentru lizibilitate)</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="grayscaleInput" />
+                <span>Convertire Alb-Negru / Tonuri de gri (reduce suplimentar ~20-30% dimensiunea)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button type="button" class="btn-primary" id="recompressBtn" disabled>
+              Recalculează comprimarea
+            </button>
+            <button type="button" class="btn-success" id="downloadBtn" disabled>
+              Descarcă PDF-ul micșorat
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="right-panel">
+        <div class="card stats-card" id="statsCard">
+          <h3>Rezultat Comprimare</h3>
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <span class="metric-label">Dimensiune Inițială</span>
+              <span class="metric-val" id="origSizeVal">—</span>
+            </div>
+            <div class="metric-box highlight">
+              <span class="metric-label">Dimensiune Nouă</span>
+              <span class="metric-val" id="newSizeVal">—</span>
+            </div>
+            <div class="metric-box savings">
+              <span class="metric-label">Reducere Obținută</span>
+              <span class="metric-val" id="savingsVal">—</span>
+            </div>
+          </div>
+
+          <div class="progress-wrap" id="progressWrap" hidden>
+            <div class="progress-info">
+              <span id="progressText">Se procesează paginile...</span>
+              <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card preview-card">
+          <div class="preview-header">
+            <div>
+              <h3>Verificare Lizibilitate în Timp Real</h3>
+              <p class="preview-sub" id="previewSub">Încărcați un PDF pentru a inspecta claritatea textului și a ștampilelor după comprimare</p>
+            </div>
+            <div class="page-nav" id="pageNav" hidden>
+              <button type="button" class="btn-icon" id="prevPageBtn" title="Pagina anterioară">&larr;</button>
+              <span id="pageIndicator">Pagina 1 / 1</span>
+              <button type="button" class="btn-icon" id="nextPageBtn" title="Pagina următoare">&rarr;</button>
+              <button type="button" class="btn-secondary btn-sm" id="toggleZoomBtn">Zoom 100%</button>
+            </div>
+          </div>
+
+          <div class="preview-viewport" id="previewViewport">
+            <div class="empty-preview" id="emptyPreview">
+              <p>Previzualizarea paginii comprimate va apărea aici pentru a confirma că toate informațiile din CV și documentele suport sunt perfect lizibile.</p>
+            </div>
+            <canvas id="previewCanvas" hidden></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
