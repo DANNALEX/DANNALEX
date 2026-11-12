@@ -1,0 +1,20 @@
+Windows Registry Editor Version 5.00
+
+; Eliminare opțiuni Meniu Clic-Dreapta (hidden-scan / Afiseaza / Sterge Metadate)
+; Dublu-clic pe acest fișier pentru a șterge intrările din Registrul Windows.
+
+[-HKEY_CURRENT_USER\Software\Classes\*\shell\HiddenScan_1_Clean]
+[-HKEY_CURRENT_USER\Software\Classes\*\shell\HiddenScan_2_Scan]
+
+[-HKEY_CURRENT_USER\Software\Classes\Directory\shell\HiddenScan_1_CleanDir]
+[-HKEY_CURRENT_USER\Software\Classes\Directory\shell\HiddenScan_2_ScanDir]
+
+[-HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\HiddenScan_1_CleanBg]
+[-HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\HiddenScan_2_ScanBg]
+
+[-HKEY_CURRENT_USER\Software\Classes\Folder\shell\HiddenScan_1_Clean]
+[-HKEY_CURRENT_USER\Software\Classes\Folder\shell\HiddenScan_2_Scan]
+
+[-HKEY_CURRENT_USER\Software\Classes\*\shell\AfiseazaStergeMetadate]
+[-HKEY_CURRENT_USER\Software\Classes\Directory\shell\AfiseazaStergeMetadate]
+[-HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\AfiseazaStergeMetadate]
