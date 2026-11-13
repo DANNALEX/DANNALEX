@@ -14,6 +14,8 @@ FILES_TO_EMBED = [
     "launcher.ps1",
     "install_context_menu.ps1",
     "uninstall_context_menu.ps1",
+    "DEZINSTALARE_MENIU_CLICK_DREAPTA.bat",
+    "ELIMINARE_CLICK_DREAPTA.reg",
     "PORNESTE_APLICATIA.bat",
     "INSTALARE_APLICATIE.bat",
     "hidden_scan/__init__.py",
